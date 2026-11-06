@@ -14,6 +14,31 @@ def test_homepage_serves_blog_interface(tmp_path):
     assert "Challenge Library" in response.text
 
 
+def test_cors_allows_nerdmaxxing_domains_and_rejects_other_origins(tmp_path):
+    app = create_app(database_path=tmp_path / "blogs.db", admin_token="test-admin-token")
+
+    with TestClient(app) as client:
+        www_response = client.options(
+            "/blogs",
+            headers={
+                "Origin": "https://www.nerdmaxxing.com",
+                "Access-Control-Request-Method": "GET",
+            },
+        )
+        apex_response = client.get(
+            "/blogs",
+            headers={"Origin": "https://nerdmaxxing.com"},
+        )
+        rejected_response = client.get(
+            "/blogs",
+            headers={"Origin": "https://example.com"},
+        )
+
+    assert www_response.headers["access-control-allow-origin"] == "https://www.nerdmaxxing.com"
+    assert apex_response.headers["access-control-allow-origin"] == "https://nerdmaxxing.com"
+    assert "access-control-allow-origin" not in rejected_response.headers
+
+
 def test_blog_read_and_admin_workflow(tmp_path):
     app = create_app(database_path=tmp_path / "blogs.db", admin_token="test-admin-token")
 

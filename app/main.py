@@ -13,6 +13,7 @@ from uuid import uuid4
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import AnyHttpUrl, BaseModel, Field
@@ -164,6 +165,16 @@ def create_app(
         yield
 
     api = FastAPI(title="Challenge Resources API", lifespan=lifespan)
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "https://www.nerdmaxxing.com",
+            "https://nerdmaxxing.com",
+        ],
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type"],
+    )
 
     @api.get("/", include_in_schema=False)
     def home() -> FileResponse:
