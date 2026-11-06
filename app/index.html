@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f7f3">
+  <title>Challenge Library</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f6f7f3;
+      --surface: #fff;
+      --ink: #1b2925;
+      --muted: #64736d;
+      --line: #dce3dd;
+      --green: #176b54;
+      --green-dark: #104c3c;
+      --green-wash: #e6f1eb;
+      --coral: #c85f43;
+      --coral-wash: #fbede7;
+      --shadow: 0 18px 50px #18352b16;
+      font-family: "Aptos", "Segoe UI Variable", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+
+    * { box-sizing: border-box; }
+      [hidden] { display: none !important; }
+    body { margin: 0; min-width: 320px; background: var(--paper); }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .page { width: min(1180px, calc(100% - 48px)); margin: 0 auto; }
+    .topbar {
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 750; letter-spacing: .08em; }
+    .brand-mark { width: 30px; height: 30px; display: grid; place-items: center; color: white; background: var(--green); border-radius: 8px 8px 8px 2px; font-family: Georgia, serif; font-size: 19px; }
+    .brand span:last-child { color: var(--muted); font-weight: 600; }
+    .button {
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 15px;
+      border: 1px solid var(--green);
+      border-radius: 5px;
+      color: white;
+      background: var(--green);
+      font-size: 13px;
+      font-weight: 700;
+      transition: background .16s ease, transform .16s ease;
+    }
+    .button:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .button.secondary { color: var(--green-dark); background: transparent; }
+    .button.secondary:hover { background: var(--green-wash); }
+    .intro { padding: 34px 0 25px; animation: arrive .38s ease both; }
+    .eyebrow { margin: 0 0 9px; color: var(--coral); font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 42px; font-weight: 500; line-height: 1.08; }
+    .intro-copy { max-width: 560px; margin: 10px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .toolbar { display: flex; align-items: end; gap: 10px; padding: 0 0 20px; }
+    .search-field { display: flex; flex: 1; align-items: center; gap: 10px; max-width: 520px; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface); }
+    .search-field svg { flex: 0 0 auto; color: var(--muted); }
+    .search-field input { width: 100%; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 13px; }
+    .search-field:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px #176b5418; }
+    .layout { display: grid; grid-template-columns: minmax(250px, 310px) minmax(0, 1fr); min-height: 510px; border-top: 1px solid var(--line); }
+    .library { padding: 22px 18px 24px 0; border-right: 1px solid var(--line); }
+    .section-label { display: flex; justify-content: space-between; align-items: center; margin: 0 0 13px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .section-label strong { color: var(--green); font-size: 11px; letter-spacing: 0; }
+    .blog-list { display: grid; gap: 5px; }
+    .blog-item { width: 100%; padding: 12px 12px 11px; border: 1px solid transparent; border-radius: 5px; text-align: left; background: transparent; color: var(--ink); }
+    .blog-item:hover { background: #fff9; }
+    .blog-item[aria-current="true"] { border-color: #c6ddd1; background: var(--green-wash); }
+    .blog-item-topic { display: block; margin-bottom: 5px; color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .blog-item-title { display: block; font-family: Georgia, "Times New Roman", serif; font-size: 17px; line-height: 1.24; }
+    .blog-item-summary { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .load-more { width: 100%; margin-top: 10px; }
+    .reader { min-width: 0; padding: 27px 0 48px 34px; }
+    .empty-state { min-height: 300px; display: grid; align-content: center; justify-items: start; }
+    .empty-symbol { width: 43px; height: 43px; display: grid; place-items: center; margin-bottom: 18px; border: 1px solid #c9ded3; border-radius: 50%; color: var(--green); background: var(--green-wash); font: 20px Georgia, serif; }
+    .empty-state h2 { margin: 0; font: 25px Georgia, "Times New Roman", serif; }
+    .empty-state p { max-width: 360px; margin: 9px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .article-head { padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+    .article-topic { display: inline-block; margin-bottom: 12px; padding: 5px 8px; border-radius: 3px; color: var(--green-dark); background: var(--green-wash); font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .article-title { max-width: 720px; margin: 0; font: 500 38px/1.12 Georgia, "Times New Roman", serif; }
+    .article-summary { max-width: 700px; margin: 13px 0 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
+    .article-date { display: block; margin-top: 16px; color: var(--muted); font-size: 11px; }
+    .prose { max-width: 740px; padding-top: 13px; font: 16px/1.8 Georgia, "Times New Roman", serif; overflow-wrap: anywhere; }
+    .prose p { margin: 14px 0; }
+    .prose h1, .prose h2, .prose h3, .prose h4 { margin: 1.5em 0 .45em; font-family: Georgia, "Times New Roman", serif; line-height: 1.2; }
+    .prose h1 { font-size: 32px; }
+    .prose h2 { font-size: 27px; }
+    .prose h3 { font-size: 22px; }
+    .prose h4 { font-size: 19px; }
+    .prose ul, .prose ol { padding-left: 24px; }
+    .prose blockquote { margin: 18px 0; padding: 2px 0 2px 17px; border-left: 3px solid var(--coral); color: #53625c; }
+    .prose code { padding: 2px 5px; border-radius: 3px; color: #16533f; background: #e9eee9; font: 13px/1.5 "Cascadia Code", Consolas, monospace; }
+    .prose pre { padding: 16px; overflow-x: auto; border-radius: 5px; background: #182b25; color: #edf4ef; font: 13px/1.6 "Cascadia Code", Consolas, monospace; }
+    .prose pre code { padding: 0; color: inherit; background: transparent; }
+    .prose a { color: var(--green-dark); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .prose-image { display: block; max-width: 100%; height: auto; margin: 20px auto; border-radius: 4px; }
+    .youtube-embed { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; margin: 22px 0; border: 0; border-radius: 4px; background: #182b25; }
+    .media-list { display: grid; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .media-list h3 { margin: 0; color: var(--muted); font: 800 10px/1.3 "Aptos", "Segoe UI", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
+    .media-list img, .media-list video { display: block; max-width: 100%; max-height: 480px; border-radius: 4px; }
+    .media-link { color: var(--green); font-size: 13px; }
+    .notice { min-height: 20px; margin: 14px 0 0; color: var(--muted); font-size: 12px; }
+    .notice.error { color: #a63e2a; }
+    dialog { width: min(680px, calc(100% - 28px)); max-height: min(90vh, 900px); padding: 0; overflow: auto; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--surface); box-shadow: var(--shadow); }
+    dialog::backdrop { background: #10251fc2; backdrop-filter: blur(3px); }
+    .compose-head { position: sticky; z-index: 1; top: 0; display: flex; justify-content: space-between; align-items: start; padding: 20px 24px 16px; border-bottom: 1px solid var(--line); background: var(--surface); }
+    .compose-head h2 { margin: 0; font: 25px Georgia, "Times New Roman", serif; }
+    .compose-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .close-button { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: 4px; color: var(--muted); background: transparent; font-size: 20px; }
+    .compose-form { display: grid; gap: 15px; padding: 20px 24px 24px; }
+      .editor-tabs { display: inline-flex; width: fit-content; padding: 3px; border: 1px solid var(--line); border-radius: 5px; background: var(--paper); }
+      .editor-tabs button { min-width: 76px; min-height: 32px; border: 0; border-radius: 3px; color: var(--muted); background: transparent; font-size: 12px; font-weight: 700; }
+      .editor-tabs button[aria-selected="true"] { color: var(--green-dark); background: white; box-shadow: 0 1px 3px #18352b1c; }
+      .preview-article { padding: 4px 0 10px; }
+      .preview-article .article-title { font-size: 30px; }
+      .preview-content { min-height: 150px; }
+    .field { display: grid; gap: 6px; }
+    .field label, .field-label { color: #46564f; font-size: 11px; font-weight: 750; }
+    .field input, .field textarea { width: 100%; min-height: 40px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 4px; outline: 0; color: var(--ink); background: #fff; font-size: 13px; }
+    .field textarea { min-height: 82px; resize: vertical; line-height: 1.5; }
+    .field input:focus, .field textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px #176b5418; }
+    #content { min-height: 210px; font: 13px/1.65 "Cascadia Code", Consolas, monospace; tab-size: 2; }
+    .two-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .image-insert { display: grid; grid-template-columns: 1fr 1.4fr auto; align-items: end; gap: 8px; padding: 12px; border: 1px solid #d5e5dc; border-radius: 5px; background: #f4f8f5; }
+      .image-upload { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+      .image-upload .button { min-height: 40px; }
+      .youtube-insert { margin-top: 12px; }
+    .image-insert .field { min-width: 0; }
+    .image-insert input { min-width: 0; }
+    .image-insert .button { min-height: 38px; padding: 0 10px; font-size: 12px; }
+    .field-hint { color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .compose-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 3px; }
+    .compose-footer .notice { flex: 1; margin: 0; }
+    .footer { padding: 20px 0 26px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .footer span { color: var(--coral); }
+    .loading { color: var(--muted); font-size: 13px; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    @media (max-width: 740px) {
+      .page { width: min(100% - 32px, 620px); }
+      .topbar { min-height: 64px; }
+      .intro { padding-top: 27px; }
+      .toolbar { align-items: stretch; }
+      .toolbar .button { padding: 0 11px; }
+      .layout { grid-template-columns: 1fr; }
+      .library { padding: 18px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+      .blog-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .reader { padding: 25px 0 38px; }
+      .empty-state { min-height: 190px; }
+    }
+    @media (max-width: 480px) {
+      .page { width: calc(100% - 24px); }
+      .brand { gap: 8px; font-size: 11px; }
+      .topbar > .button { min-height: 36px; padding: 0 11px; }
+      .intro-copy { font-size: 13px; }
+      .toolbar { flex-wrap: wrap; }
+      .search-field { flex-basis: 100%; max-width: none; }
+      .toolbar .button { flex: 1; }
+      .blog-list { grid-template-columns: 1fr; }
+      .blog-item { padding: 10px; }
+      .blog-item-summary { display: none; }
+      .two-fields, .image-insert { grid-template-columns: 1fr; }
+        .image-upload { grid-template-columns: 1fr; }
+      .compose-head { padding: 17px 17px 14px; }
+      .compose-form { padding: 17px; }
+      .compose-footer { align-items: stretch; flex-direction: column-reverse; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    .brand, .eyebrow, .section-label, .blog-item-topic, .article-topic, .media-list h3 { letter-spacing: 0; }
+    .section-label strong { letter-spacing: 0; }
+    @media (max-width: 480px) {
+      h1 { font-size: 34px; }
+      .article-title { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="brand" aria-label="Challenge Library home">
+        <span class="brand-mark" aria-hidden="true">N</span>
+        <span>CHALLENGE</span><span>/ LIBRARY</span>
+      </div>
+      <button class="button" id="open-compose" type="button">
+        <span aria-hidden="true">+</span> New post
+      </button>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Field notes &amp; useful references</p>
+        <h1 id="page-title">Challenge Library</h1>
+        <p class="intro-copy">Guides, notes, and resources for the parts worth figuring out.</p>
+      </section>
+
+      <form class="toolbar" id="search-form" role="search">
+        <label class="search-field" for="topic-search">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4.5 4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          <input id="topic-search" type="search" maxlength="100" placeholder="Search titles and content" autocomplete="off">
+        </label>
+        <button class="button" type="submit">Search blogs</button>
+        <button class="button secondary" id="show-all" type="button">Show all</button>
+      </form>
+
+      <div class="layout">
+        <nav class="library" aria-label="Blog list">
+          <p class="section-label"><span id="list-label">Latest notes</span><strong id="blog-count">—</strong></p>
+          <div class="blog-list" id="blog-list"><p class="loading">Loading library…</p></div>
+          <button class="button secondary load-more" id="load-more" type="button" hidden>Load more</button>
+          <p class="notice" id="list-notice" role="status" aria-live="polite"></p>
+        </nav>
+
+        <section class="reader" aria-label="Selected blog">
+          <div class="empty-state" id="empty-state">
+            <span class="empty-symbol" aria-hidden="true">N</span>
+            <h2>Choose a note to read</h2>
+            <p>Select a resource from the library, or search for a topic to narrow the list.</p>
+          </div>
+          <article id="article" hidden>
+            <header class="article-head">
+              <span class="article-topic" id="article-topic"></span>
+              <h2 class="article-title" id="article-title"></h2>
+              <p class="article-summary" id="article-summary"></p>
+              <time class="article-date" id="article-date"></time>
+            </header>
+            <div class="prose" id="article-content"></div>
+            <section class="media-list" id="media-list" hidden aria-label="Additional media">
+              <h3>Additional media</h3>
+              <div id="media-items"></div>
+            </section>
+          </article>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">A small shelf for <span>hard-won knowledge.</span></footer>
+  </div>
+
+  <dialog id="compose-dialog" aria-labelledby="compose-title">
+    <header class="compose-head">
+      <div>
+        <h2 id="compose-title">Write a resource</h2>
+        <p>Posts are published directly to the library.</p>
+      </div>
+      <button class="close-button" id="close-compose" type="button" aria-label="Close composer">×</button>
+    </header>
+    <form class="compose-form" id="compose-form">
+      <div class="field">
+        <label for="admin-token">Admin token</label>
+        <input id="admin-token" type="password" required autocomplete="current-password" placeholder="Bearer token">
+      </div>
+      <div class="two-fields">
+        <div class="field">
+          <label for="title">Title</label>
+          <input id="title" name="title" required maxlength="200" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="topic">Topic</label>
+          <input id="topic" name="topic" required maxlength="100" autocomplete="off">
+        </div>
+      </div>
+      <div class="field">
+        <label for="summary">Short summary</label>
+        <input id="summary" name="summary" maxlength="500" autocomplete="off">
+      </div>
+      <div class="editor-tabs" role="tablist" aria-label="Post editor view">
+        <button id="write-tab" type="button" role="tab" aria-selected="true" aria-controls="write-panel">Write</button>
+        <button id="preview-tab" type="button" role="tab" aria-selected="false" aria-controls="preview-panel">Preview</button>
+      </div>
+      <section id="write-panel" role="tabpanel" aria-labelledby="write-tab">
+        <div class="field">
+          <label for="content">Blog content (Markdown)</label>
+          <textarea id="content" name="content" required maxlength="1000000" placeholder="Paste Markdown here…"></textarea>
+          <span class="field-hint">Paste a complete Markdown draft, then preview it before publishing.</span>
+        </div>
+        <div class="field">
+          <label for="image-file">Upload an image to R2</label>
+          <div class="image-upload">
+            <input id="image-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,image/avif">
+            <button class="button secondary" id="upload-image" type="button">Upload &amp; insert</button>
+          </div>
+          <span class="field-hint">PNG, JPEG, GIF, WebP, or AVIF; maximum 10 MB. Upload requires the admin token.</span>
+        </div>
+        <div class="image-insert" aria-label="Insert an inline image">
+          <div class="field">
+            <label for="image-alt">Image description</label>
+            <input id="image-alt" maxlength="200" placeholder="Alt text">
+          </div>
+          <div class="field">
+            <label for="image-url">Public image URL</label>
+            <input id="image-url" type="url" placeholder="https://…" inputmode="url">
+          </div>
+          <button class="button secondary" id="insert-image" type="button">Insert at cursor</button>
+        </div>
+        <span class="field-hint">You can also insert an existing public image URL.</span>
+                <div class="field youtube-insert">
+                  <label for="youtube-url">YouTube video URL</label>
+                  <div class="image-upload">
+                    <input id="youtube-url" type="url" placeholder="https://youtu.be/…" inputmode="url">
+                    <button class="button secondary" id="insert-youtube" type="button">Embed at cursor</button>
+                  </div>
+                  <span class="field-hint">Embeds from YouTube; no video upload or R2 storage needed.</span>
+                </div>
+        <div class="field">
+          <label for="media-urls">Additional media URLs</label>
+          <textarea id="media-urls" placeholder="One public URL per line"></textarea>
+          <span class="field-hint">Optional media shown after the article. Put images in the Markdown to position them within the text.</span>
+        </div>
+      </section>
+      <section id="preview-panel" role="tabpanel" aria-labelledby="preview-tab" hidden>
+        <article class="preview-article">
+          <header class="article-head">
+            <span class="article-topic" id="preview-topic"></span>
+            <h2 class="article-title" id="preview-title"></h2>
+            <p class="article-summary" id="preview-summary"></p>
+            <span class="article-date">Preview</span>
+          </header>
+          <div class="prose preview-content" id="preview-content"></div>
+          <section class="media-list" id="preview-media-list" hidden aria-label="Additional media preview">
+            <h3>Additional media</h3>
+            <div id="preview-media-items"></div>
+          </section>
+        </article>
+      </section>
+      <div class="compose-footer">
+        <p class="notice" id="compose-notice" role="status" aria-live="polite"></p>
+        <button class="button" id="publish" type="submit">Publish post</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    const blogList = document.querySelector("#blog-list");
+    const article = document.querySelector("#article");
+    const emptyState = document.querySelector("#empty-state");
+    const composeDialog = document.querySelector("#compose-dialog");
+    const searchInput = document.querySelector("#topic-search");
+    const listNotice = document.querySelector("#list-notice");
+    const composeNotice = document.querySelector("#compose-notice");
+    const contentInput = document.querySelector("#content");
+    const writeTab = document.querySelector("#write-tab");
+    const previewTab = document.querySelector("#preview-tab");
+    const writePanel = document.querySelector("#write-panel");
+    const previewPanel = document.querySelector("#preview-panel");
+    const pageSize = 100;
+    let activeTopic = "";
+    let nextOffset = 0;
+    let selectedSlug = "";
+    let loadingMore = false;
+
+    function safeHttpUrl(value) {
+      try {
+        const url = new URL(value, window.location.origin);
+        return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function youtubeVideoId(value) {
+      let url;
+      try { url = new URL(value); } catch { return null; }
+      if (!['http:', 'https:'].includes(url.protocol)) return null;
+
+      const host = url.hostname.toLowerCase();
+      let videoId = null;
+      if (host === "youtu.be" || host === "www.youtu.be") {
+        videoId = url.pathname.split("/").filter(Boolean)[0];
+      } else if (["youtube.com", "www.youtube.com", "m.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(host)) {
+        if (url.pathname === "/watch") videoId = url.searchParams.get("v");
+        else videoId = url.pathname.match(/^\/(?:embed|shorts)\/([A-Za-z0-9_-]{11})(?:\/|$)/)?.[1] || null;
+      }
+      return videoId && /^[A-Za-z0-9_-]{11}$/.test(videoId) ? videoId : null;
+    }
+
+    function renderYouTubeEmbed(url) {
+      const videoId = youtubeVideoId(url);
+      if (!videoId) return null;
+      return `<iframe class="youtube-embed" src="https://www.youtube-nocookie.com/embed/${videoId}" title="YouTube video player" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      })[character]);
+    }
+
+    function renderInline(markdown) {
+      const tokenPattern = /@\[youtube\]\(https?:\/\/[^\s)]+\)|!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|`([^`]+)`|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
+      let html = "";
+      let previousIndex = 0;
+      for (const match of markdown.matchAll(tokenPattern)) {
+        html += escapeHtml(markdown.slice(previousIndex, match.index));
+        if (match[0].startsWith("@[youtube](")) {
+          const embed = renderYouTubeEmbed(match[0].slice(11, -1));
+          html += embed || escapeHtml(match[0]);
+        } else if (match[1] !== undefined) {
+          const url = safeHttpUrl(match[2]);
+          html += url ? `<img class="prose-image" src="${escapeHtml(url)}" alt="${escapeHtml(match[1])}" loading="lazy" decoding="async">` : escapeHtml(match[0]);
+        } else if (match[3] !== undefined) {
+          const url = safeHttpUrl(match[4]);
+          html += url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(match[3])}</a>` : escapeHtml(match[0]);
+        } else if (match[5] !== undefined) {
+          html += `<code>${escapeHtml(match[5])}</code>`;
+        } else if (match[6] !== undefined) {
+          html += `<strong>${escapeHtml(match[6])}</strong>`;
+        } else {
+          html += `<em>${escapeHtml(match[7])}</em>`;
+        }
+        previousIndex = match.index + match[0].length;
+      }
+      return html + escapeHtml(markdown.slice(previousIndex));
+    }
+
+    function renderMarkdown(markdown) {
+      const lines = String(markdown).replace(/\r\n?/g, "\n").split("\n");
+      const blocks = [];
+      const startsBlock = (line) => /^(#{1,4}\s|```|>\s?|\s*[-*+]\s+|\s*\d+\.\s+)/.test(line);
+      let index = 0;
+
+      while (index < lines.length) {
+        const line = lines[index].trim();
+        if (!line) {
+          index += 1;
+          continue;
+        }
+        if (line.startsWith("```")) {
+          index += 1;
+          const code = [];
+          while (index < lines.length && !lines[index].trim().startsWith("```")) {
+            code.push(lines[index]);
+            index += 1;
+          }
+          if (index < lines.length) index += 1;
+          blocks.push(`<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`);
+          continue;
+        }
+
+        const heading = line.match(/^(#{1,4})\s+(.+)$/);
+        if (heading) {
+          const level = heading[1].length;
+          blocks.push(`<h${level}>${renderInline(heading[2])}</h${level}>`);
+          index += 1;
+          continue;
+        }
+
+        if (/^>\s?/.test(line)) {
+          const quote = [];
+          while (index < lines.length && /^>\s?/.test(lines[index].trim())) {
+            quote.push(renderInline(lines[index].trim().replace(/^>\s?/, "")));
+            index += 1;
+          }
+          blocks.push(`<blockquote>${quote.join("<br>")}</blockquote>`);
+          continue;
+        }
+
+        const unordered = /^\s*[-*+]\s+/.test(lines[index]);
+        const ordered = /^\s*\d+\.\s+/.test(lines[index]);
+        if (unordered || ordered) {
+          const items = [];
+          const pattern = unordered ? /^\s*[-*+]\s+/ : /^\s*\d+\.\s+/;
+          while (index < lines.length && pattern.test(lines[index])) {
+            items.push(`<li>${renderInline(lines[index].replace(pattern, ""))}</li>`);
+            index += 1;
+          }
+          blocks.push(`<${unordered ? "ul" : "ol"}>${items.join("")}</${unordered ? "ul" : "ol"}>`);
+          continue;
+        }
+
+        const paragraph = [];
+        while (index < lines.length && lines[index].trim() && !startsBlock(lines[index].trim())) {
+          paragraph.push(renderInline(lines[index]));
+          index += 1;
+        }
+        if (paragraph.length) blocks.push(`<p>${paragraph.join("<br>")}</p>`);
+      }
+
+      return blocks.join("");
+    }
+
+    function setNotice(element, message, isError = false) {
+      element.textContent = message;
+      element.classList.toggle("error", isError);
+    }
+
+    function formatDate(value) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? "" : new Intl.DateTimeFormat(undefined, {
+        year: "numeric", month: "long", day: "numeric"
+      }).format(date);
+    }
+
+    function makeBlogButton(blog) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "blog-item";
+      button.dataset.slug = blog.slug;
+      button.setAttribute("aria-current", String(blog.slug === selectedSlug));
+      const topic = document.createElement("span");
+      topic.className = "blog-item-topic";
+      topic.textContent = blog.topic;
+      const title = document.createElement("span");
+      title.className = "blog-item-title";
+      title.textContent = blog.title;
+      button.append(topic, title);
+      if (blog.summary) {
+        const summary = document.createElement("span");
+        summary.className = "blog-item-summary";
+        summary.textContent = blog.summary;
+        button.append(summary);
+      }
+      button.addEventListener("click", () => openBlog(blog.slug));
+      return button;
+    }
+
+    async function readError(response) {
+      try {
+        const body = await response.json();
+        return typeof body.detail === "string" ? body.detail : JSON.stringify(body.detail || body);
+      } catch {
+        return `Request failed (${response.status})`;
+      }
+    }
+
+    async function loadBlogs({ append = false } = {}) {
+      if (loadingMore) return;
+      loadingMore = true;
+      if (!append) {
+        nextOffset = 0;
+        blogList.replaceChildren(Object.assign(document.createElement("p"), { className: "loading", textContent: "Loading library…" }));
+      }
+      setNotice(listNotice, "");
+      const query = new URLSearchParams({ limit: String(pageSize), offset: String(nextOffset) });
+      const endpoint = activeTopic ? `/blogs/search?${query}&q=${encodeURIComponent(activeTopic)}` : `/blogs?${query}`;
+      try {
+        const response = await fetch(endpoint, { headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error(await readError(response));
+        const result = await response.json();
+        if (!append) blogList.replaceChildren();
+        result.items.forEach((blog) => blogList.append(makeBlogButton(blog)));
+        nextOffset += result.items.length;
+        document.querySelector("#blog-count").textContent = String(result.total);
+        document.querySelector("#list-label").textContent = activeTopic ? `Search: ${activeTopic}` : "Latest notes";
+        document.querySelector("#load-more").hidden = nextOffset >= result.total;
+        if (result.total === 0) {
+          const empty = document.createElement("p");
+          empty.className = "loading";
+          empty.textContent = activeTopic ? "No blogs match this search term." : "No notes have been published yet.";
+          blogList.append(empty);
+        }
+      } catch (error) {
+        if (!append) blogList.replaceChildren();
+        setNotice(listNotice, `Could not load blogs: ${error.message}`, true);
+      } finally {
+        loadingMore = false;
+      }
+    }
+
+    function renderMedia(urls, sectionSelector = "#media-list", containerSelector = "#media-items") {
+      const section = document.querySelector(sectionSelector);
+      const container = document.querySelector(containerSelector);
+      container.replaceChildren();
+      const safeUrls = (urls || []).map(safeHttpUrl).filter(Boolean);
+      section.hidden = safeUrls.length === 0;
+      for (const url of safeUrls) {
+        const path = new URL(url).pathname.toLowerCase();
+        let media;
+        if (/\.(mp4|webm|ogg|mov)$/.test(path)) {
+          media = document.createElement("video");
+          media.controls = true;
+          media.preload = "metadata";
+          media.src = url;
+        } else if (/\.(png|jpe?g|gif|webp|avif)$/.test(path)) {
+          media = document.createElement("img");
+          media.src = url;
+          media.alt = "Additional blog media";
+          media.loading = "lazy";
+        } else {
+          media = document.createElement("a");
+          media.className = "media-link";
+          media.href = url;
+          media.target = "_blank";
+          media.rel = "noopener noreferrer";
+          media.textContent = "Open media";
+        }
+        container.append(media);
+      }
+    }
+
+    function renderComposerPreview() {
+      document.querySelector("#preview-topic").textContent = document.querySelector("#topic").value.trim() || "Topic";
+      document.querySelector("#preview-title").textContent = document.querySelector("#title").value.trim() || "Untitled blog";
+      const summary = document.querySelector("#preview-summary");
+      summary.textContent = document.querySelector("#summary").value.trim();
+      summary.hidden = !summary.textContent;
+      document.querySelector("#preview-content").innerHTML = renderMarkdown(contentInput.value);
+      const mediaUrls = document.querySelector("#media-urls").value.split(/\r?\n/).map((url) => url.trim()).filter(Boolean);
+      renderMedia(mediaUrls, "#preview-media-list", "#preview-media-items");
+    }
+
+    function setComposerView(view) {
+      const previewing = view === "preview";
+      writeTab.setAttribute("aria-selected", String(!previewing));
+      previewTab.setAttribute("aria-selected", String(previewing));
+      writePanel.hidden = previewing;
+      previewPanel.hidden = !previewing;
+      contentInput.required = !previewing;
+      if (previewing) renderComposerPreview();
+    }
+
+    async function openBlog(slug) {
+      try {
+        const response = await fetch(`/blogs/${encodeURIComponent(slug)}`, { headers: { Accept: "application/json" } });
+        if (!response.ok) throw new Error(await readError(response));
+        const blog = await response.json();
+        selectedSlug = blog.slug;
+        document.querySelectorAll(".blog-item").forEach((item) => {
+          item.setAttribute("aria-current", String(item.dataset.slug === selectedSlug));
+        });
+        document.querySelector("#article-topic").textContent = blog.topic;
+        document.querySelector("#article-title").textContent = blog.title;
+        document.querySelector("#article-summary").textContent = blog.summary;
+        document.querySelector("#article-summary").hidden = !blog.summary;
+        document.querySelector("#article-date").textContent = formatDate(blog.created_at);
+        document.querySelector("#article-content").innerHTML = renderMarkdown(blog.content);
+        renderMedia(blog.media_urls);
+        emptyState.hidden = true;
+        article.hidden = false;
+        if (window.matchMedia("(max-width: 740px)").matches) article.scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (error) {
+        setNotice(listNotice, `Could not open blog: ${error.message}`, true);
+      }
+    }
+
+    document.querySelector("#search-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      activeTopic = searchInput.value.trim();
+      selectedSlug = "";
+      loadBlogs();
+    });
+
+    document.querySelector("#show-all").addEventListener("click", () => {
+      searchInput.value = "";
+      activeTopic = "";
+      selectedSlug = "";
+      loadBlogs();
+    });
+
+    document.querySelector("#load-more").addEventListener("click", () => loadBlogs({ append: true }));
+    document.querySelector("#open-compose").addEventListener("click", () => {
+      setNotice(composeNotice, "");
+      setComposerView("write");
+      composeDialog.showModal();
+    });
+    writeTab.addEventListener("click", () => setComposerView("write"));
+    previewTab.addEventListener("click", () => setComposerView("preview"));
+    document.querySelector("#close-compose").addEventListener("click", () => composeDialog.close());
+    composeDialog.addEventListener("click", (event) => {
+      if (event.target === composeDialog) composeDialog.close();
+    });
+
+    function insertMarkdownAtCursor(markdown) {
+      const start = contentInput.selectionStart;
+      const end = contentInput.selectionEnd;
+      const prefix = start > 0 && contentInput.value[start - 1] !== "\n" ? "\n\n" : "";
+      const suffix = end < contentInput.value.length && contentInput.value[end] !== "\n" ? "\n\n" : "";
+      contentInput.setRangeText(`${prefix}${markdown}${suffix}`, start, end, "end");
+      contentInput.focus();
+    }
+
+    function insertImageMarkdown(url, alt) {
+      insertMarkdownAtCursor(`![${alt}](${url})`);
+    }
+
+    document.querySelector("#upload-image").addEventListener("click", async () => {
+      const fileInput = document.querySelector("#image-file");
+      const file = fileInput.files[0];
+      const uploadButton = document.querySelector("#upload-image");
+      if (!file) {
+        setNotice(composeNotice, "Choose an image file first.", true);
+        fileInput.focus();
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        setNotice(composeNotice, "Image must be 10 MB or smaller.", true);
+        return;
+      }
+
+      uploadButton.disabled = true;
+      setNotice(composeNotice, "Uploading image to R2…");
+      try {
+        const response = await fetch("/media", {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${document.querySelector("#admin-token").value.trim()}`,
+            "Content-Type": file.type
+          },
+          body: file
+        });
+        if (!response.ok) throw new Error(await readError(response));
+        const result = await response.json();
+        const filenameAlt = file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim();
+        const alt = document.querySelector("#image-alt").value.trim() || filenameAlt || "Uploaded image";
+        insertImageMarkdown(result.url, alt);
+        fileInput.value = "";
+        document.querySelector("#image-alt").value = "";
+        setNotice(composeNotice, "Image uploaded and inserted into the Markdown.");
+      } catch (error) {
+        setNotice(composeNotice, error.message || "Could not upload image.", true);
+      } finally {
+        uploadButton.disabled = false;
+      }
+    });
+
+    document.querySelector("#insert-image").addEventListener("click", () => {
+      const urlInput = document.querySelector("#image-url");
+      const altInput = document.querySelector("#image-alt");
+      let parsedUrl;
+      try { parsedUrl = new URL(urlInput.value); } catch { parsedUrl = null; }
+      if (!parsedUrl || !["http:", "https:"].includes(parsedUrl.protocol)) {
+        setNotice(composeNotice, "Enter a valid public HTTP or HTTPS image URL.", true);
+        urlInput.focus();
+        return;
+      }
+      insertImageMarkdown(parsedUrl.href, altInput.value.trim() || "Image");
+      urlInput.value = "";
+      altInput.value = "";
+      setNotice(composeNotice, "Image Markdown inserted at the cursor.");
+    });
+
+    document.querySelector("#insert-youtube").addEventListener("click", () => {
+      const urlInput = document.querySelector("#youtube-url");
+      const videoId = youtubeVideoId(urlInput.value.trim());
+      if (!videoId) {
+        setNotice(composeNotice, "Enter a valid YouTube watch, share, or Shorts URL.", true);
+        urlInput.focus();
+        return;
+      }
+      insertMarkdownAtCursor(`@[youtube](https://youtu.be/${videoId})`);
+      urlInput.value = "";
+      setNotice(composeNotice, "YouTube embed inserted at the cursor.");
+    });
+
+    document.querySelector("#compose-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!contentInput.value.trim()) {
+        setComposerView("write");
+        setNotice(composeNotice, "Add Markdown content before publishing.", true);
+        contentInput.focus();
+        return;
+      }
+      const token = document.querySelector("#admin-token").value.trim();
+      const mediaUrls = document.querySelector("#media-urls").value.split(/\r?\n/).map((url) => url.trim()).filter(Boolean);
+      const body = {
+        title: document.querySelector("#title").value.trim(),
+        topic: document.querySelector("#topic").value.trim(),
+        summary: document.querySelector("#summary").value.trim(),
+        content: contentInput.value,
+        media_urls: mediaUrls
+      };
+      const publishButton = document.querySelector("#publish");
+      publishButton.disabled = true;
+      setNotice(composeNotice, "Publishing…");
+      try {
+        const response = await fetch("/blogs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify(body)
+        });
+        if (!response.ok) throw new Error(await readError(response));
+        const blog = await response.json();
+        document.querySelector("#compose-form").reset();
+        setComposerView("write");
+        composeDialog.close();
+        activeTopic = "";
+        searchInput.value = "";
+        await loadBlogs();
+        await openBlog(blog.slug);
+      } catch (error) {
+        setNotice(composeNotice, error.message || "Could not publish the blog.", true);
+      } finally {
+        publishButton.disabled = false;
+      }
+    });
+
+    loadBlogs();
+  </script>
+</body>
+</html>
